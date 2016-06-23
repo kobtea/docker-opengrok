@@ -1,6 +1,8 @@
 #!/bin/bash
 
 echo 'start tomcat...'
+mv $OPENGROK_TOMCAT_BASE/webapps/source.war $OPENGROK_TOMCAT_BASE/webapps/$WEBAPP_NAME.war
+rm -rf $OPENGROK_TOMCAT_BASE/webapps/$WEBAPP_NAME
 catalina.sh start
 
 echo 'index projects...'
