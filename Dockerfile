@@ -1,10 +1,17 @@
-FROM tomcat:8.0
+FROM tomcat:9.0
 MAINTAINER kobtea
 
 RUN apt-get update && \
-    apt-get install -y exuberant-ctags git inotify-tools
+    apt-get install -y git inotify-tools autoconf pkg-config make gcc
+RUN git clone --depth 1 https://github.com/universal-ctags/ctags.git /tmp/ctags
+WORKDIR /tmp/ctags
+RUN bash autogen.sh && \
+    bash configure && \
+    make && \
+    make install
+
 RUN mkdir -p /var/opengrok/src /var/opengrok/data
-RUN wget -O - https://github.com/OpenGrok/OpenGrok/files/213268/opengrok-0.12.1.5.tar.gz | tar xvzf - --directory=/var/opengrok --strip-components=1
+RUN wget -O - https://github.com/OpenGrok/OpenGrok/releases/download/1.0/opengrok-1.0.tar.gz | tar xvzf - --directory=/var/opengrok --strip-components=1
 
 ENV OPENGROK_TOMCAT_BASE /usr/local/tomcat
 ENV OPENGROK_INSTANCE_BASE /var/opengrok
