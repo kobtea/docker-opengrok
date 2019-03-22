@@ -1,8 +1,9 @@
 FROM tomcat:9.0
-MAINTAINER kobtea
 
 RUN apt-get update && \
-    apt-get install -y git inotify-tools autoconf pkg-config make gcc python3 python3-pip
+    apt-get install -y --no-install-recommends git inotify-tools automake autoconf build-essential pkg-config make gcc python3 python3-setuptools python3-pip && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 RUN git clone --depth 1 https://github.com/universal-ctags/ctags.git /tmp/ctags
 WORKDIR /tmp/ctags
 RUN bash autogen.sh && \
@@ -11,6 +12,7 @@ RUN bash autogen.sh && \
     make install
 
 RUN mkdir -p /var/opengrok/src /var/opengrok/data /var/opengrok/etc
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN wget -O - https://github.com/OpenGrok/OpenGrok/releases/download/1.1/opengrok-1.1.tar.gz | tar xvzf - --directory=/var/opengrok --strip-components=1
 RUN python3 -m pip install /var/opengrok/tools/opengrok-tools.tar.gz
 
@@ -22,7 +24,7 @@ ENV WEBAPP_NAME source
 
 RUN opengrok-indexer -a /var/opengrok/lib/opengrok.jar -- -s /var/opengrok/src -d /var/opengrok/data -W /var/opengrok/etc/configuration.xml
 
-ADD run.sh /usr/local/bin/run
+COPY run.sh /usr/local/bin/run
 CMD ["/usr/local/bin/run"]
 
 EXPOSE 8080
