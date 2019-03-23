@@ -5,7 +5,7 @@ COPY --from=ctags /usr/local/bin/uctags /usr/local/bin/ctags
 RUN apk --update --no-cache add jansson yaml libxml2 git inotify-tools python3
 RUN mkdir -p /var/opengrok/src /var/opengrok/data /var/opengrok/etc
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
-RUN wget -O - https://github.com/OpenGrok/OpenGrok/releases/download/1.1/opengrok-1.1.tar.gz | tar xvzf - --directory=/var/opengrok --strip-components=1
+RUN wget -O - https://github.com/OpenGrok/OpenGrok/releases/download/1.2.6/opengrok-1.2.6.tar.gz | tar xvzf - --directory=/var/opengrok --strip-components=1
 RUN python3 -m pip install /var/opengrok/tools/opengrok-tools.tar.gz
 
 ENV OPENGROK_TOMCAT_BASE /usr/local/tomcat
