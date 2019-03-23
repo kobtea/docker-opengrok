@@ -1,16 +1,8 @@
-FROM tomcat:9.0
+FROM universalctags/ctags-docker AS ctags
 
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends git inotify-tools automake autoconf build-essential pkg-config make gcc python3 python3-setuptools python3-pip && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-RUN git clone --depth 1 https://github.com/universal-ctags/ctags.git /tmp/ctags
-WORKDIR /tmp/ctags
-RUN bash autogen.sh && \
-    bash configure && \
-    make && \
-    make install
-
+FROM tomcat:9.0-alpine
+COPY --from=ctags /usr/local/bin/uctags /usr/local/bin/ctags
+RUN apk --update --no-cache add jansson yaml libxml2 git inotify-tools python3
 RUN mkdir -p /var/opengrok/src /var/opengrok/data /var/opengrok/etc
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN wget -O - https://github.com/OpenGrok/OpenGrok/releases/download/1.1/opengrok-1.1.tar.gz | tar xvzf - --directory=/var/opengrok --strip-components=1
